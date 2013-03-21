@@ -1,0 +1,27 @@
+<h1>Listing statements</h1>
+
+<table>
+  <tr>
+    <th>Account</th>
+    <th>Closing date</th>
+    <th>Due date</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @statements.each do |statement| %>
+  <tr>
+    <td><%= statement.account.name %></td>
+    <td><%= statement.closing_date %></td>
+    <td><%= statement.due_date %></td>
+    <td><%= link_to 'Show', statement %></td>
+    <td><%= link_to 'Edit', edit_statement_path(statement) %></td>
+    <td><%= link_to 'Destroy', statement, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Statement', new_statement_path %>

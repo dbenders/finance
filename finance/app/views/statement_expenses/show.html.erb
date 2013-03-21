@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Date:</b>
+  <%= @statement_expense.date %>
+</p>
+
+<p>
+  <b>Num:</b>
+  <%= @statement_expense.num %>
+</p>
+
+<p>
+  <b>Installment:</b>
+  <%= @statement_expense.installment %>
+</p>
+
+<p>
+  <b>Ammount:</b>
+  <%= @statement_expense.ammount %>
+</p>
+
+
+<%= link_to 'Edit', edit_statement_expense_path(@statement_expense) %> |
+<%= link_to 'Back', statement_expenses_path %>
