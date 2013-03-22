@@ -1,30 +1,28 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b>Account:</b>
-  <%= @statement.account.name %>
+  <b>Cuenta:</b>
+  <%= link_to(@statement.account.name, @statement.account) %>
 </p>
 
 <p>
-  <b>Closing date:</b>
+  <b>Cierre:</b>
   <%= @statement.closing_date %>
 </p>
 
 <p>
-  <b>Due date:</b>
+  <b>Vencimiento:</b>
   <%= @statement.due_date %>
 </p>
 
-<table>
-<tr><td>
-  <b>Transactions:</b>
-  <table>
+<b>Transactions:</b>
+<table width="800px">
   <tr>
-    <th>Date</th>
-    <th>Description</th>
-    <th>Installment</th>
+    <th>Fecha</th>
+    <th>Descripción</th>
+    <th>Cuota</th>
     <th>Num</th>
-    <th>Ammount</th>
+    <th>Monto</th>
   </tr>
   <tbody>
   <% sum_installments = 0; sum_all = 0 %>
@@ -32,18 +30,14 @@
   <% sum_installments += exp.ammount if exp.installment > 0 %>
   <% sum_all += exp.ammount if exp.ammount > 0 %> 
   <tr>
-    <td><%= exp.date %></td>
+    <td><%= exp.date.strftime('%D') %></td>
     <td><%= exp.description %></td>
-    <td><%= exp.installment %></td>
+    <td><%= (exp.installment > 0)? "#{exp.installment}/#{exp.total_installments}" : "-" %></td>
     <td><%= exp.num %></td>
-    <td><%= exp.ammount %></td>
+    <td><%= "$ #{exp.ammount}" %></td>
   </tr>
   <% end %>
   </tbody>
-</table>
-</td><td>
-<img src="https://chart.googleapis.com/chart?cht=bvs&chco=4D89F9,C6D9FD&chd=t:<%= "#{sum_installments.to_i}|#{sum_all.to_i}" %>&chds=0,<%= sum_all.to_i %>&chs=60x225&chbh=a"/>
-</td></tr>
 </table>
 
 <%= link_to 'Edit', edit_statement_path(@statement) %> |

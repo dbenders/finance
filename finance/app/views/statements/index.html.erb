@@ -10,7 +10,7 @@
     <th></th>
   </tr>
 
-<% @statements.each do |statement| %>
+<% @statements.select { |stmt| not stmt.account.nil? }.each do |statement| %>
   <tr>
     <td><%= statement.account.name %></td>
     <td><%= statement.closing_date %></td>

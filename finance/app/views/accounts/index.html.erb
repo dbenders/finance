@@ -18,6 +18,33 @@
 <% end %>
 </table>
 
-<br />
-
 <%= link_to 'New Account', new_account_path %>
+
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Monto', 'Cuotas', 'Compras'],
+      <% Account.forecast.each do |date,f| %>
+        <% d = "'" + Date.strptime(date.to_s,'%m').strftime('%b') + "'" %>
+        <%= "[#{d},#{f[:total_with_installments].to_i},#{(f[:total] - f[:total_with_installments]).to_i}],".html_safe %>
+      <% end %>
+    ]);
+
+    var options = {
+      title: 'Forecast',
+      vAxis: {title: 'Monto'},
+      isStacked: true,
+      colors: ['4D89F9','C6D9FD','papayawhip']
+    };
+
+    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
+</script>
+ 
