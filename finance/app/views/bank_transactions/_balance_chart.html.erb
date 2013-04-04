@@ -1,0 +1,30 @@
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+    <%
+      values = bank_transactions.each.collect { |trans|
+        "[#{trans.date.strftime('new Date(%y,%m,%d)')},#{trans.balance}]"
+      }      
+    %>
+    var data = google.visualization.arrayToDataTable([
+      ['Date', 'Balance'],
+      
+    ]);
+
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('date','Date');
+    dataTable.addColumn('number','Balance');
+    dataTable.addRows([<%= values.join(',').html_safe %>]);
+
+    var options = {
+      title: 'Balance',
+      pointSize: 5
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    chart.draw(dataTable, options);
+  }
+</script>

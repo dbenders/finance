@@ -1,0 +1,74 @@
+<div class="row">
+
+<h3>Dashboard</h3>
+
+<div class="well">
+
+<%= render 'accounts/forecast', :statements => Account.statements %>
+
+<div>
+	<h4>Cuentas bancarias</h4>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Nombre</th>
+					<th>Saldo</th>
+				</tr>
+			</thead>
+			<tbody>			
+			<% BankAccount.all.each do |acct| %>
+				<tr>
+					<td><%= link_to acct,acct %></td>
+					<td><%= number_to_currency(acct.balance) %></td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>	
+</div>
+<div>
+	<h4>Tarjetas</h4>
+	<%= render 'accounts/list', :accounts => Account.credit_cards %>
+</div>
+<div>
+	<h4>Créditos personales</h4>
+	<%= render 'accounts/list', :accounts => Account.loans %>
+</div>
+
+<div>
+	<h4>Otras cuentas de gastos
+		<%= link_to "nueva", new_account_path, :class => "btn" %>	
+	</h4>
+	<%= render 'accounts/list', :accounts => Account.expense_accounts %>	
+</div>
+
+<div>
+	<h4>Débitos Automáticos</h4>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Descripción</th>
+				<th>Monto</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% Account.recurring_transactions.each do |trans| %>
+			<tr>
+				<td><%= trans.description %></td>
+				<td><%= number_to_currency(trans.ammount) %></td>
+			</tr>
+			<% end %>
+		</tbody>
+	</table>
+</div>
+
+<div>
+<h3>Paster</h3>
+<%= form_tag 'paster' do %>
+  <%= text_area_tag(:text, "", :size => "200x5") %>
+  <br/>
+  <%= submit_tag "Enviar", :class => "btn" %>
+<% end %>
+</div>
+
+</div>
+</div>

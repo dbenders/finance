@@ -1,0 +1,20 @@
+<h1>Cuenta</h1>
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Nombre:</b>
+  <%= @bank_account.name %>
+</p>
+
+<p>
+  <b>CBU:</b>
+  <%= @bank_account.cbu %>
+</p>
+
+<%= render 'bank_transactions/balance_chart', :bank_transactions => @bank_account.bank_transactions, :bank_account => @bank_account %>
+
+<%= render 'bank_transactions/list', :bank_transactions => @bank_account.bank_transactions.select { |trans| trans.date.month == Date.today.month }, :bank_account => @bank_account %>
+
+<%= link_to 'Edit', edit_bank_account_path(@bank_account) %> |
+<%= link_to 'Back', bank_accounts_path %>

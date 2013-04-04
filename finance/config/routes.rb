@@ -1,9 +1,26 @@
 Finance::Application.routes.draw do
-  resources :statements
 
-  resources :accounts
 
-  resources :statement_expenses
+  resources :category_rules do    
+    get 'apply', :on => :collection
+  end
+
+  resources :loans
+
+  resources :bank_accounts do
+    resources :bank_transactions
+  end
+
+  resources :accounts do    
+    resources :statements do
+      resources :expenses do
+        get 'toggle_recurring'
+      end
+    end    
+    get 'rebuild_future'
+    get 'recurring_transaction'
+  end
+
   resources :paster do
   end
 
@@ -57,7 +74,7 @@ Finance::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+  root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
 

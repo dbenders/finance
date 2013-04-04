@@ -1,4 +1,4 @@
 require 'test_helper'
 
-class StatementExpensesHelperTest < ActionView::TestCase
+class ExpensesHelperTest < ActionView::TestCase
 end

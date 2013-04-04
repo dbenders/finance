@@ -76,8 +76,38 @@ class AccountsController < ApplicationController
     @account.destroy
 
     respond_to do |format|
-      format.html { redirect_to accounts_url }
+      format.html { redirect_to :root }
       format.json { head :no_content }
     end
   end
+
+  def recurring_transaction
+    account = Account.find(params[:account_id])
+    stmt = account.current_statement
+    if stmt.nil? 
+      d = Date.today
+      d = d.to_time.advance(:months => 1).to_date
+      d = d.to_time.advance(:days => -d.day).to_date
+      stmt = account.statements.create(:closing_date => d, :due_date => d)
+      respond_to do |format|
+        format.html { redirect_to new_statement_expense_path(stmt) }
+      end
+    end
+
+  end
+
+
+  def rebuild_future
+    @account = Account.find(params[:account_id])
+    respond_to do |format|
+      if @account.rebuild_future
+        format.html { redirect_to @account, notice: 'Account was successfully updated.' }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @statement.errors, status: :unprocessable_entity }
+      end   
+    end
+  end
+
 end

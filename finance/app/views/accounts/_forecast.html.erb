@@ -1,0 +1,36 @@
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+
+
+<script type="text/javascript">
+  var chart;
+
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+      <% 
+      values = statements.sort_by {|stmt| stmt.closing_date}.collect do |stmt| 
+        d = stmt.closing_date.strftime('%m')
+        [d,
+        stmt.ammount_with_recurring.to_i,
+        stmt.ammount_with_installments.to_i,
+        (stmt.ammount - stmt.ammount_with_installments - stmt.ammount_with_recurring).to_i].to_s
+      end
+      %>
+
+    var data = google.visualization.arrayToDataTable(
+      [['Monto', 'Deb. Automático', 'Cuotas', 'Compras']].concat([<%= values.join(',').html_safe %>]));
+
+    var options = {
+      title: 'Forecast',
+      vAxis: {title: 'Monto'},
+      isStacked: true,
+      colors: ['blue','4D89F9','C6D9FD']
+    };
+
+    chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
+  
+</script>
+
+ 

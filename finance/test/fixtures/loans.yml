@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  type: 
+  num: MyString
+  total_installments: 1
+  ammount: 1.5
+
+two:
+  type: 
+  num: MyString
+  total_installments: 1
+  ammount: 1.5

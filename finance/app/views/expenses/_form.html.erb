@@ -1,0 +1,51 @@
+<h3><%= @statement.account %></h3>
+<h5>Fecha de cierre: <%= @statement.closing_date.strftime("%d/%m/%y") %></h5>
+<%= form_for([@statement.account,@statement,@expense]) do |f| %>
+  <% if @expense.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@expense.errors.count, "error") %> prohibited this expense from being saved:</h2>
+
+      <ul>
+      <% @expense.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :date, "Fecha" %>
+    <%= f.date_select :date %>
+  </div>
+  <div class="field">
+    <%= f.label :num, "Numero" %>
+    <%= f.text_field :num %>
+  </div>
+  <div class="field">
+    <%= f.label :description, "Descripción" %>
+    <%= f.text_field :description, :style => "width:500px;" %>
+  </div>  
+  <div class="field">
+    <%= f.label :installment, "Cuota" %>
+    <%= f.number_field :installment, :style => "width: 50px" %>
+    &nbsp;&nbsp;de&nbsp;&nbsp;
+    <%= f.number_field :total_installments, :style => "width: 50px" %>
+  </div>  
+  <div class="field">
+    <%= f.label :ammount, "Monto" %>
+    $ <%= f.text_field :ammount, :style => "width: 100px" %>
+  </div>
+  <div class="field">
+    <% f.label :recurring, "Recurrente" %>
+    <%= f.check_box :recurring %>
+  </div>
+  <div class="field">
+    <%= f.label :categories, "Categorías" %><br />
+    <%= f.text_field :categories, :style => "width: 300px" %>
+  </div>
+  <br />
+  
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,33 @@
+<center>
+<div id="chart_div" style="width: 500px; height: 200px;"></div>
+</center>
+
+<script type="text/javascript">
+  var chart;
+
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+      <% 
+      values = {}
+      expenses.each do |exp| 
+        (exp.categories || "").split(',').each do |cat|
+          values[cat] = (values[cat] || 0) + exp.ammount
+        end
+      end
+      %>
+
+    var data = google.visualization.arrayToDataTable(
+      [['Categoria', 'Monto']].concat(<%= values.collect { |k,v| [k,v] }.to_s.html_safe %>));
+
+    var options = {
+      title: 'Categorrias',
+    };
+
+    chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
+  
+</script>
+
+ 

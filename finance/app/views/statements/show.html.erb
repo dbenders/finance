@@ -1,44 +1,80 @@
+
+<div class="row">
+
+<h3>
+  Resumen de cuenta
+  <%= link_to 'Borrar', [@statement.account,@statement], method: :delete, data: { confirm: 'Are you sure?' }, 
+  :class => "btn btn-danger" %>
+</h3>
+
+<h5><%= @statement.account %></h5>
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Cuenta:</b>
-  <%= link_to(@statement.account.name, @statement.account) %>
-</p>
+<div class="well">
 
-<p>
-  <b>Cierre:</b>
-  <%= @statement.closing_date %>
-</p>
+<%= render 'categories', :expenses => @statement.expenses %>
 
-<p>
-  <b>Vencimiento:</b>
-  <%= @statement.due_date %>
-</p>
+<div class="row offset3">
+<div class="span2">
+  <b>Cierre</b>
+  <div class="alert"><%= @statement.closing_date.strftime("%d/%m/%y") %></div>
+</div>
 
-<b>Transactions:</b>
-<table width="800px">
+<div class="span2">
+  <b>Vencimiento</b>
+  <div class="alert">
+  <% if @statement.due_date.nil? %>
+    <b>Resumen futuro estimado</b>
+  <% else %>
+    <%= @statement.due_date %>
+  <% end %>
+</div>
+</div>
+
+<div class="span2">
+  <b>Total</b>
+  <div class="alert">
+    <%= number_to_currency(@statement.ammount) %>
+  </div>
+</div>
+
+</div>
+
+<h5>Transacciones
+  <%= link_to 'Nueva', new_account_statement_expense_path(@statement.account, @statement), :class => "btn" %> <br/>
+</h5>
+<table width="800px" class="table">
   <tr>
     <th>Fecha</th>
     <th>Descripción</th>
     <th>Cuota</th>
     <th>Num</th>
     <th>Monto</th>
+    <th>Recurrente</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
   </tr>
   <tbody>
-  <% sum_installments = 0; sum_all = 0 %>
-  <% @statement.statement_expenses.each do |exp| %>
-  <% sum_installments += exp.ammount if exp.installment > 0 %>
-  <% sum_all += exp.ammount if exp.ammount > 0 %> 
+  <% @statement.expenses.each do |exp| %>
   <tr>
-    <td><%= exp.date.strftime('%D') %></td>
-    <td><%= exp.description %></td>
-    <td><%= (exp.installment > 0)? "#{exp.installment}/#{exp.total_installments}" : "-" %></td>
+    <td><%= (exp.date)? exp.date.strftime('%D') : "" %></td>
+    <td>
+      <% if exp.categories %>
+        <small style="color:red"><%= "[#{exp.categories}]" %></small>
+      <% end %>
+      <%= link_to exp.description, edit_account_statement_expense_path(@statement.account, @statement, exp) %>
+    </td>
+    <td><%= ((exp.installment || 0) > 0)? "#{exp.installment}/#{exp.total_installments}" : "-" %></td>
     <td><%= exp.num %></td>
     <td><%= "$ #{exp.ammount}" %></td>
+    <td><%= ((exp.installment || 0) > 0) ? "" : (link_to exp.recurring == true ? "yes" : "no", [@statement.account, @statement, exp,'toggle_recurring']) %></td>
+    <td><%= link_to 'Borrar', [@statement.account,@statement,exp], method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger" %></td>
   </tr>
   <% end %>
   </tbody>
 </table>
 
-<%= link_to 'Edit', edit_statement_path(@statement) %> |
-<%= link_to 'Back', statements_path %>
+<%= link_to 'Volver', account_path(@statement.account), :class => "btn" %> 
+
+</div>
+</div>

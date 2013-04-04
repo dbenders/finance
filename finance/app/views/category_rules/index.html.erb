@@ -1,0 +1,52 @@
+<h1>Listing category_rules</h1>
+
+<table>
+  <tr>
+    <th>Category</th>
+    <th>Rule</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @category_rules.each do |category_rule| %>
+  <tr>
+    <td><%= category_rule.category %></td>
+    <td><%= category_rule.rule %></td>
+    <td><%= link_to 'Show', category_rule %></td>
+    <td><%= link_to 'Edit', edit_category_rule_path(category_rule) %></td>
+    <td><%= link_to 'Destroy', category_rule, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<p>
+<%= link_to 'Apply all', apply_category_rules_path %>
+</p>
+
+<%= form_for(@new_category_rule) do |f| %>
+  <% if @new_category_rule.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@new_category_rule.errors.count, "error") %> prohibited this category_rule from being saved:</h2>
+
+      <ul>
+      <% @new_category_rule.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :category %><br />
+    <%= f.text_field :category %>
+  </div>
+  <div class="field">
+    <%= f.label :rule %><br />
+    <%= f.text_field :rule %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -11,11 +11,10 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </div>
+<h5><%= f.select :account_type, Account.account_types, :style => "font-size: 14px;" %></h5>
+<h3><%= f.text_field :name, :style => "width: 600px; font-size: 24.5px;" %></h3>
   <div class="actions">
     <%= f.submit %>
+    <%= link_to "Volver", :back, :class => "btn" %>
   </div>
 <% end %>

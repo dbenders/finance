@@ -17,7 +17,7 @@ class StatementsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @statement }
+      format.json { render json: @statement.to_json(:include => :expenses) }
     end
   end
 
@@ -34,13 +34,16 @@ class StatementsController < ApplicationController
 
   # GET /statements/1/edit
   def edit
+    @account = Account.find(params[:account_id])
     @statement = Statement.find(params[:id])
   end
 
   # POST /statements
   # POST /statements.json
   def create
+    account = Account.find(params[:statement].delete(:account))
     @statement = Statement.new(params[:statement])
+    @statement.account = account
 
     respond_to do |format|
       if @statement.save
@@ -76,8 +79,9 @@ class StatementsController < ApplicationController
     @statement.destroy
 
     respond_to do |format|
-      format.html { redirect_to statements_url }
+      format.html { redirect_to @statement.account }
       format.json { head :no_content }
     end
   end
+
 end

@@ -1,0 +1,28 @@
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Description</th>
+    <th>Ammount</th>
+    <th>Balance</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% bank_transactions.each do |bank_transaction| %>
+  <tr>
+    <td><%= bank_transaction.date %></td>
+    <td><%= bank_transaction.description %></td>
+    <td><%= bank_transaction.ammount %></td>
+    <td><%= bank_transaction.balance %></td>
+    <td><%= link_to 'Show', [bank_account,bank_transaction] %></td>
+    <td><%= link_to 'Edit', edit_bank_account_bank_transaction_path(bank_account,bank_transaction) %></td>
+    <td><%= link_to 'Destroy', [bank_account,bank_transaction], method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Bank transaction', new_bank_account_bank_transaction_path(bank_account) %>
+

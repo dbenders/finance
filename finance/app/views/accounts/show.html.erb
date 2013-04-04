@@ -1,38 +1,68 @@
-<p id="notice"><%= notice %></p>
-
-<p>
-  <b>Name:</b>
+<h5><%= @account.account_type_readable %></h5>
+<h3>
   <%= @account.name %>
-</p>
+  <%= link_to "editar",edit_account_path(@account), :class => "btn" %>
+  <%= link_to "borrar", @account, method: :delete, data: {confirm: 'Are you sure?'}, :class => "btn btn-danger" %>
+
+  <%= link_to 'regenerar futuro', account_rebuild_future_path(@account), :class => "btn" %>
+</h3>
+
+<div class="row">
+<div class="well">
+<p id="notice"><%= notice %></p>
 
 <div id="chart_div" style="width: 900px; height: 500px;"></div>
 
-<%= link_to 'Edit', edit_account_path(@account) %> |
-<%= link_to 'Back', accounts_path %>
+<!--
+<%= link_to 'New recurring transaction', account_recurring_transaction_path(@account) %>
+-->
+
+
+</div>
+<%= link_to 'Volver', accounts_path, :class => "btn" %>
+
+</div>
 
 
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
+  var chart;
+  var statements;
+
   google.load("visualization", "1", {packages:["corechart"]});
   google.setOnLoadCallback(drawChart);
   function drawChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['Monto', 'Cuotas', 'Compras'],
-      <% @account.forecast.each do |date,f| %>
-      	<% d = '"' + date.strftime('%d/%m') + '"' %>
-      	<%= "[#{d},#{f[:total_with_installments].to_i},#{(f[:total] - f[:total_with_installments]).to_i}],".html_safe %>
-      <% end %>
-    ]);
+      <% 
+      values = @account.statements.collect do |stmt| 
+        d = stmt.closing_date.strftime('%d/%m')
+        [d,
+        stmt.ammount_with_recurring.to_i,
+        stmt.ammount_with_installments.to_i,        
+        (stmt.ammount - stmt.ammount_with_installments - stmt.ammount_with_recurring).to_i].to_s
+      end
+      %>
+
+    statements = <%= "[#{@account.statements.collect { |stmt| stmt.id }.join(',')}]" %>;
+
+    var data = google.visualization.arrayToDataTable(
+      [['Monto', 'Deb. Automático', 'Cuotas', 'Compras']].concat([<%= values.join(',').html_safe %>]));
 
     var options = {
       title: 'Forecast',
       vAxis: {title: 'Monto'},
       isStacked: true,
-      colors: ['4D89F9','C6D9FD','papayawhip']
+      colors: ['blue','4D89F9','C6D9FD']
     };
 
-    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    google.visualization.events.addListener(chart, 'select', selectHandler);    
     chart.draw(data, options);
   }
+  
+  function selectHandler(e) {
+    var selection = chart.getSelection()[0];
+
+    window.location.href = '<%= account_statement_path(@account,"") %>' + statements[selection.row];
+  } 
+  
 </script>
- 

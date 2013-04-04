@@ -11,12 +11,46 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130321163630) do
+ActiveRecord::Schema.define(:version => 20130325181207) do
 
   create_table "accounts", :force => true do |t|
     t.string   "name"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.string   "account_type"
+  end
+
+  create_table "bank_accounts", :force => true do |t|
+    t.string   "name"
+    t.string   "cbu"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "bank_transactions", :force => true do |t|
+    t.date     "date"
+    t.string   "description"
+    t.float    "ammount"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.float    "balance"
+    t.integer  "bank_account_id"
+  end
+
+  create_table "category_rules", :force => true do |t|
+    t.string   "category"
+    t.string   "rule"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "loans", :force => true do |t|
+    t.string   "type"
+    t.string   "num"
+    t.integer  "total_installments"
+    t.float    "ammount"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
   end
 
   create_table "statement_expenses", :force => true do |t|
@@ -29,6 +63,9 @@ ActiveRecord::Schema.define(:version => 20130321163630) do
     t.string   "description"
     t.integer  "statement_id"
     t.integer  "total_installments"
+    t.boolean  "recurring"
+    t.string   "type"
+    t.string   "categories"
   end
 
   create_table "statements", :force => true do |t|

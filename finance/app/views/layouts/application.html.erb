@@ -4,11 +4,15 @@
   <title>Finance</title>
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
+  <!-- <%= javascript_include_tag "http://code.jquery.com/jquery-1.9.1.min.js" %> -->
+  <%= javascript_include_tag "https://www.google.com/jsapi" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
-<%= yield %>
+<div class="container">
+	<%= yield %>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Type:</b>
+  <%= @loan.type %>
+</p>
+
+<p>
+  <b>Num:</b>
+  <%= @loan.num %>
+</p>
+
+<p>
+  <b>Total installments:</b>
+  <%= @loan.total_installments %>
+</p>
+
+<p>
+  <b>Ammount:</b>
+  <%= @loan.ammount %>
+</p>
+
+
+<%= link_to 'Edit', edit_loan_path(@loan) %> |
+<%= link_to 'Back', loans_path %>

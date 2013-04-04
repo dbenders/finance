@@ -1,4 +1,7 @@
-<%= form_for(@statement) do |f| %>
+<h5><%= @statement.account.account_type_readable %>
+<h3><%= @statement.account %></h3>
+
+<%= form_for([@statement.account, @statement]) do |f| %>
   <% if @statement.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@statement.errors.count, "error") %> prohibited this statement from being saved:</h2>
@@ -12,18 +15,15 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :account %><br />
-    <%= f.text_field :account %>
-  </div>
-  <div class="field">
-    <%= f.label :closing_date %><br />
+    <%= f.label :closing_date, "Fecha de cierre" %><br />
     <%= f.date_select :closing_date %>
   </div>
   <div class="field">
-    <%= f.label :due_date %><br />
+    <%= f.label :due_date, "Fecha de vencimiento" %><br />
     <%= f.date_select :due_date %>
   </div>
   <div class="actions">
     <%= f.submit %>
+    <%= link_to "Volver", :back, :class => "btn" %>
   </div>
 <% end %>

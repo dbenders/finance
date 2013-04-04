@@ -1,50 +1,28 @@
-<h1>Listing accounts</h1>
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
+<h3>Cuentas de gastos
+<%= link_to 'Nueva', new_account_path, :class => "btn" %>
+</h3>
 
-<% @accounts.each do |account| %>
-  <tr>
-    <td><%= account.name %></td>
-    <td><%= link_to 'Show', account %></td>
-    <td><%= link_to 'Edit', edit_account_path(account) %></td>
-    <td><%= link_to 'Destroy', account, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
-</table>
+<div class="row">
 
-<%= link_to 'New Account', new_account_path %>
+<div class="well">
+  <%= render 'forecast', :statements => Account.statements %>
+</div>
 
-<div id="chart_div" style="width: 900px; height: 500px;"></div>
+<div class="well">
+  <table>
+  <% Set.new(@accounts.collect { |acct| acct.account_type_readable }).each do |type| %>
+    <tr><td colspan="2"><h5><%= type %></h5></td></tr>
+    <% @accounts.select { |acct| acct.account_type_readable == type }.each do |acct| %>
+    <tr>
+      <td><%= link_to acct,acct %></td><td><%= number_to_currency((acct.current_statement || Statement.new).ammount) %></td>
+    </tr>
+    <% end %>
+  <% end %>
+  </table>
+</div>
 
+<%= link_to "Volver", :root, :class => "btn" %>
 
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">
-  google.load("visualization", "1", {packages:["corechart"]});
-  google.setOnLoadCallback(drawChart);
-  function drawChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['Monto', 'Cuotas', 'Compras'],
-      <% Account.forecast.each do |date,f| %>
-        <% d = "'" + Date.strptime(date.to_s,'%m').strftime('%b') + "'" %>
-        <%= "[#{d},#{f[:total_with_installments].to_i},#{(f[:total] - f[:total_with_installments]).to_i}],".html_safe %>
-      <% end %>
-    ]);
-
-    var options = {
-      title: 'Forecast',
-      vAxis: {title: 'Monto'},
-      isStacked: true,
-      colors: ['4D89F9','C6D9FD','papayawhip']
-    };
-
-    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-    chart.draw(data, options);
-  }
-</script>
- 
+</div>
+</div>

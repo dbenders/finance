@@ -1,69 +1,159 @@
 class Account < ActiveRecord::Base
 	has_many :statements, :order => 'closing_date ASC'
-  attr_accessible :name
+  attr_accessible :name, :account_type
+
+  def to_s
+    name
+  end
+
+  def account_type_readable
+    case account_type 
+    when :credit_card.to_s
+      "Tarjeta de Credito"
+    when :loan.to_s
+      "Credito"
+    when :certificate_of_deposit.to_s
+      "Plazo fijo"
+    when :expenses.to_s
+      "Cuenta de gastos"      
+    else
+      "Cuenta de credito"
+    end
+  end
+
+  def self.credit_cards
+    all.select { |acct| acct.account_type == :credit_card.to_s }
+  end
+
+  def self.loans
+    all.select { |acct| acct.account_type == :loan.to_s }
+  end
+
+  def self.certificates_of_deposit
+    all.select { |acct| acct.account_type == :certificate_of_deposit.to_s }
+  end
+
+  def self.expense_accounts
+    all.select { |acct| acct.account_type == :expenses.to_s }
+  end
+
+  def self.account_types
+    [ ["Tarjeta de Credito",:credit_card],
+      ["Credito",:loan],
+      ["Cuenta de gastos",:expenses]
+    ]
+  end
+  
+  def self.statements
+    ans = {}
+    all.each do |acct| 
+      acct.statements.each do |stmt|
+        month = stmt.closing_date.month
+        ans[month] ||= StatementMock.new(stmt.closing_date.to_time.advance(:days => -stmt.closing_date.day+1).to_date)
+        ans[month].ammount += stmt.ammount
+        ans[month].ammount_with_installments += stmt.ammount_with_installments
+        ans[month].ammount_with_recurring += stmt.ammount_with_recurring
+      end
+    end
+    ans.values
+  end
+
+  def self.recurring_transactions
+    all
+      .select { |acct| not acct.current_statement.nil? }
+      .collect { |acct| acct.current_statement.expenses.all.select { |trans| trans.recurring } }
+      .flatten
+  end
 
   def current_statement
-    statements.last
+    statements.select { |stmt| not stmt.due_date.nil? }.last
+  end
 
   def last_statement
-    statements.all[statements.size-2]
+    statements.select { |stmt| not stmt.due_date.nil? }[-2]
   end
 
   def current_expenses
     d = statements.find_by_closing_date(nil)
-    (d.nil?)? [] : d.statement_expenses
+    (d.nil?)? [] : d.expenses
   end  
 
-  def self.forecast
-    ans = {}
+  def rebuild_future
+    #statements.delete_all("due_date is null")
+    statements.select { |stmt| stmt.due_date.nil? }.each do |stmt|
+      stmt.delete
+    end
 
-    all.each do |acct| 
-      acct.forecast.each do |date,f| 
-        (ans[date.month]||={})[:total] = (ans[date.month][:total] || 0.0) + f[:total]
-        ans[date.month][:total_with_installments] = (ans[date.month][:total_with_installments] || 0.0) + f[:total_with_installments]
+    # last -> current
+    stmt = current_statement
+    if not last_statement.nil?
+      last_statement.expenses
+        .select { |exp| (exp.installment > 0 and exp.total_installments - exp.installment > 0) or (exp.recurring) }
+        .each do |exp|
+
+          exp2 = Expense.find_or_create_by_statement_id_and_num(stmt.id, exp.num)
+          [:ammount, :date, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }
+          if exp.installment > 0
+            exp2.installment = exp.installment + 1
+          else
+            exp2.installment = 0
+          end
+          exp2.save!
+      end
+
+      true
+    end
+
+    current_expenses = current_statement.expenses    
+    # current -> future    
+    i=1
+    d = current_statement.closing_date
+    modified = true
+    while modified
+      modified = false
+      d = d.to_time.advance(:months => 1).to_date
+
+      stmt = Statement.find_or_create_by_account_id_and_closing_date(id, d)
+      stmt.expenses.clear
+      current_expenses.select { |exp| exp.installment > 0 and exp.total_installments - exp.installment >= i }.each do |exp|
+        exp2 = Expense.new
+        [:ammount, :date, :num, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }        
+        exp2.statement = stmt
+        modified = true
+        exp2.installment = exp.installment + i
+        exp2.save!       
+      end
+      i = i+1
+    end
+
+    d = current_statement.closing_date
+    (1..10).each do |j|
+      d = d.to_time.advance(:months => 1).to_date
+
+      stmt = Statement.find_or_create_by_account_id_and_closing_date(id, d)
+      current_expenses.select { |exp| exp.recurring }.each do |exp|
+        modified = true
+        exp2 = Expense.new
+        [:ammount, :date, :num, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }        
+        exp2.statement = stmt
+        exp2.installment = 0
+        exp2.save!       
+        puts "(#{j}) #{exp2.date} - #{exp2.description}"
       end
     end
-    puts ans
-    ans
+    true
   end
 
-  def forecast
-    ans = {}
-    statements.select { |stmt| not stmt.closing_date.nil? }.each do |stmt|
-      ans[stmt.closing_date] = {:total_with_installments => stmt.ammount_with_installments, :total => stmt.ammount }            
-    end    
-    return {} if ans.empty?
+end
 
-    last_date = ans.keys.max
-    last_stmt = statements.find_by_closing_date(last_date)    
+class StatementMock
+  attr_accessor :ammount, :ammount_with_installments, :ammount_with_recurring, :closing_date
 
-    last_stmt.statement_expenses.each do |trans|
-      if trans.installment > 0 and trans.total_installments > trans.installment
-        d = last_date
-        (1..trans.total_installments-trans.installment).each do |i|
-          d = d.to_time.advance(:months => 1).to_date
-          ans[d] = {:total => 0.0, :total_with_installments => 0.0} if not ans.has_key?(d)
-          ans[d][:total] += trans.ammount
-          ans[d][:total_with_installments] += trans.ammount
-        end
-      end
-    end
-
-    last_expenses.each do |trans|
-      d = last_date.to_time.advance(:months => 1).to_date
-      ans[d] = {:total => 0.0, :total_this_month => 0.0, :total_with_installments => 0.0} if not ans.has_key?(d)
-      ans[d][:total] += trans.ammount
-
-      if trans.installment == 1        
-        ans[d][:total_with_installments] += trans.ammount
-        (1..trans.total_installments-trans.installment).each do |i|
-          d = d.to_time.advance(:months => 1).to_date
-          ans[d] = {:total => 0.0, :total_with_installments => 0.0} if not ans.has_key?(d)
-          ans[d][:total] += trans.ammount
-          ans[d][:total_with_installments] += trans.ammount
-        end
-      end
-    end
-    ans
+  def initialize(closing_date)
+    @ammount = 0
+    @ammount_with_installments = 0
+    @ammount_with_recurring = 0
+    @closing_date = closing_date
   end
 end
+

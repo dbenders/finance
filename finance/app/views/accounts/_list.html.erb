@@ -1,0 +1,25 @@
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Nombre</th>
+			<th>Cierre</th>
+			<th>Vencimiento</th>
+			<th>Saldo</th>
+		</tr>
+	</thead>
+	<tbody>			
+	<% accounts.each do |acct| %>
+		<tr>
+			<td><%= link_to acct,acct %></td>			
+			<% if acct.current_statement.nil? %>
+				<td colspan="3">&nbsp;</td>
+			<% else %>			
+				<td><%= acct.current_statement.closing_date.strftime('%d/%b') %></td>
+				<td><%= acct.current_statement.due_date.strftime('%d/%b') %></td>
+				<td><%= number_to_currency(acct.current_statement.ammount) %></td>
+			<% end %>
+		</tr>
+	<% end %>
+</tbody>
+</table>
