@@ -1,0 +1,31 @@
+
+<table width="800px" class="table">
+  <tr>
+    <th>Fecha</th>
+    <th>Descripción</th>
+    <th>Cuota</th>
+    <th>Num</th>
+    <th>Monto</th>
+    <th>Recurrente</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+  </tr>
+  <tbody>
+  <% expenses.each do |exp| %>
+  <tr>
+    <td><%= (exp.date)? exp.date.strftime('%D') : "" %></td>
+    <td>
+      <% if exp.categories %>
+        <small style="color:red"><%= "[#{exp.categories}]" %></small>
+      <% end %>
+      <%= link_to exp.description, edit_account_statement_expense_path(exp.statement.account_id, exp.statement, exp) %>
+    </td>
+    <td><%= ((exp.installment || 0) > 0)? "#{exp.installment}/#{exp.total_installments}" : "-" %></td>
+    <td><%= exp.num %></td>
+    <td><%= "$ #{exp.ammount}" %></td>
+    <td><%= ((exp.installment || 0) > 0) ? "" : (link_to exp.recurring == true ? "yes" : "no", [exp.statement.account, exp.statement, exp,'toggle_recurring']) %></td>
+    <td><%= link_to 'Borrar', account_statement_expense_path(exp.statement.account_id,exp.statement,exp), method: :delete, data: { confirm: 'Are you sure?' }, :class => "btn btn-danger" %></td>
+  </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,10 @@
+<div id="paster_dialog" title="Basic dialog">
+
+<p>Pegue el texto de su Home Banking aquí</p>
+<%= form_tag do %>
+  <%= text_area_tag(:text, "", :size => "90x20") %>
+  <br/>
+  <%= submit_tag "enviar" %>
+<% end %>
+
+</div>

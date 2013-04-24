@@ -92,7 +92,7 @@ class Account < ActiveRecord::Base
         .each do |exp|
 
           exp2 = Expense.find_or_create_by_statement_id_and_num(stmt.id, exp.num)
-          [:ammount, :date, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }
+          [:ammount, :date, :description, :total_installments, :recurring, :categories].each { |k| exp2[k] = exp[k] }
           if exp.installment > 0
             exp2.installment = exp.installment + 1
           else
@@ -117,7 +117,7 @@ class Account < ActiveRecord::Base
       stmt.expenses.clear
       current_expenses.select { |exp| exp.installment > 0 and exp.total_installments - exp.installment >= i }.each do |exp|
         exp2 = Expense.new
-        [:ammount, :date, :num, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }        
+        [:ammount, :date, :num, :description, :total_installments, :recurring, :categories].each { |k| exp2[k] = exp[k] }        
         exp2.statement = stmt
         modified = true
         exp2.installment = exp.installment + i
@@ -134,7 +134,7 @@ class Account < ActiveRecord::Base
       current_expenses.select { |exp| exp.recurring }.each do |exp|
         modified = true
         exp2 = Expense.new
-        [:ammount, :date, :num, :description, :total_installments, :recurring].each { |k| exp2[k] = exp[k] }        
+        [:ammount, :date, :num, :description, :total_installments, :recurring, :categories].each { |k| exp2[k] = exp[k] }        
         exp2.statement = stmt
         exp2.installment = 0
         exp2.save!       

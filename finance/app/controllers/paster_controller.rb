@@ -32,7 +32,7 @@ private
 	end
 
 
-	def create_statement(text)
+	def create_statement(text)	
 		data = patagonia_statement(text) || santander_statement(text)
 
 		if not data.nil? and not data.empty?

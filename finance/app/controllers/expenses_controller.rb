@@ -3,7 +3,10 @@ class ExpensesController < ApplicationController
   # GET /expenses.json
   def index
     @expenses = Expense.all(:order => :date)
-
+    @month = (params[:month] || "0").to_i
+    if @month > 0
+      @expenses = @expenses.select {|exp| not exp.statement.nil? and not exp.statement.closing_date.nil? and exp.statement.closing_date.month == @month}
+    end
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @expenses }

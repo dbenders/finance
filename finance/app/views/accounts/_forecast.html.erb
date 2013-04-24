@@ -3,6 +3,9 @@
 
 <script type="text/javascript">
   var chart;
+  var months;
+
+  months = <%= "[#{statements.sort_by {|stmt| stmt.closing_date}.collect { |stmt| stmt.closing_date.month }.join(',')}]" %>;
 
   google.load("visualization", "1", {packages:["corechart"]});
   google.setOnLoadCallback(drawChart);
@@ -28,9 +31,16 @@
     };
 
     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    google.visualization.events.addListener(chart, 'select', selectHandler);    
     chart.draw(data, options);
   }
   
+  function selectHandler(e) {
+    var selection = chart.getSelection()[0];
+
+    window.location.href = '<%= expenses_path %>?month=' + months[selection.row];
+  } 
+
 </script>
 
  

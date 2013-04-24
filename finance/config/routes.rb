@@ -21,6 +21,12 @@ Finance::Application.routes.draw do
     get 'recurring_transaction'
   end
 
+  resources :expenses do
+  end
+
+  resources :categories do
+  end
+
   resources :paster do
   end
 

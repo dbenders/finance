@@ -1,0 +1,13 @@
+
+<h3>Gastos por categoría
+</h3>
+
+<div class="row">
+
+<div class="well">
+  <%= render 'forecast', :categories => @categories, :expenses_by_month => @expenses_by_month %>
+</div>
+
+<%= link_to "Volver", :root, :class => "btn" %>
+
+</div>

@@ -3,16 +3,42 @@
 <head>
   <title>Finance</title>
   <%= stylesheet_link_tag    "application", :media => "all" %>
+
   <%= javascript_include_tag "application" %>
-  <!-- <%= javascript_include_tag "http://code.jquery.com/jquery-1.9.1.min.js" %> -->
+  <%= javascript_include_tag "http://code.jquery.com/jquery-1.9.1.min.js" %> 
+  <%= javascript_include_tag "http://code.jquery.com/ui/1.10.2/jquery-ui.js" %>
+  <%= stylesheet_link_tag "http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" %>
+
   <%= javascript_include_tag "https://www.google.com/jsapi" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="/">Gastos</a>
+    <ul class="nav">
+      <li><a href="/">Dashboard</a></li>
+	  <li><a id="import" href="#">Importar</a></li>
+    </ul>
+  </div>
+</div>
+
 <div class="container">
 	<%= yield %>
 </div>
+
+<%= render "paster/dialog" %>
+ 
+<script>
+$("#import").click(function() {
+	$.get("/paster", function(resp) {
+		$("#paster_dialog").dialog();	
+	});
+});
+
+</script>
+
 
 </body>
 </html>
